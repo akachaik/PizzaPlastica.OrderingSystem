@@ -1,3 +1,5 @@
+using PizzaPlastica.OrderingSystem.Abstractions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseOrleans(siloBuilder =>
@@ -5,6 +7,7 @@ builder.Host.UseOrleans(siloBuilder =>
     if (builder.Environment.IsDevelopment())
     {
         siloBuilder.UseLocalhostClustering();
+        siloBuilder.AddMemoryGrainStorage("tableorderstorage");
     }
     
 });
@@ -24,6 +27,20 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapPost("restaurant/{restaurantId}/tables/{tableId}", async (
+    IClusterClient client,
+    Guid restaurantId,
+    int tableId) =>
+{
+    var tableOrderGrain = client.GetGrain<ITableOrderGrain>(restaurantId, tableId.ToString());
+
+    await tableOrderGrain.OpenTableOrder();
+
+    return Results.Ok();
+})
+.WithName("OpenTableOrder")
+.WithOpenApi();
 
 await app.RunAsync();
 

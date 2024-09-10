@@ -1,0 +1,11 @@
+@Server = https://localhost:7287
+
+@restaurantId = df76dc64-56c7-44ed-bc39-945c807c4bba
+@tableId = 3
+
+### 
+
+POST {{Server}}/restaurant/{{restaurantId}}/tables/{{tableId}}
+Accept: application/json
+
+###

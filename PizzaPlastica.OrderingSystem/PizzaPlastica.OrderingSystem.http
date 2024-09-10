@@ -1,0 +1,6 @@
+@PizzaPlastica.OrderingSystem_HostAddress = http://localhost:5020
+
+GET {{PizzaPlastica.OrderingSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

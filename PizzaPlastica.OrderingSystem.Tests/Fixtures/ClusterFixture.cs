@@ -30,6 +30,6 @@ public class TestSiloConfigurations : ISiloConfigurator
                 isSupported: type => type.Namespace?.StartsWith("PizzaPlastica.OrderingSystem.Abstractions") ?? false);
         });
         siloBuilder.AddMemoryGrainStorage("table-order-storage");
-        siloBuilder.UseInMemoryReminderService();
+        siloBuilder.UseInMemoryReminderService();  // add this line to support reminders
     }
 }

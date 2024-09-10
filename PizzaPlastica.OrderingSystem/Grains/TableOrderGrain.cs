@@ -13,10 +13,12 @@ public class TableOrderState
     public List<TableOrderItem> OrderItems { get; set; } = new();
 }
 
-public class TableOrderGrain : Grain, ITableOrderGrain
+public class TableOrderGrain : Grain, ITableOrderGrain, IRemindable
 {
 
     private readonly IPersistentState<TableOrderState> _state;
+
+    private IGrainReminder? _reminder = null;
 
     public TableOrderGrain(
         [PersistentState("table-order", "table-order-storage")]
@@ -36,6 +38,10 @@ public class TableOrderGrain : Grain, ITableOrderGrain
 
         _state.State.OrderItems = new List<TableOrderItem>();
 
+        _reminder = await this.RegisterOrUpdateReminder(reminderName: "TableOrderExpired",
+            dueTime: TimeSpan.FromMinutes(2),
+            period: TimeSpan.FromMinutes(3));
+
         await _state.WriteStateAsync();
 
     }
@@ -49,6 +55,12 @@ public class TableOrderGrain : Grain, ITableOrderGrain
 
         _state.State.IsOpen = false;
         _state.State.OrderItems = new List<TableOrderItem>();
+
+        if (_reminder is not null)
+        {
+            await this.UnregisterReminder(_reminder);
+            _reminder = null;
+        }
 
         await _state.WriteStateAsync();
     }
@@ -94,4 +106,12 @@ public class TableOrderGrain : Grain, ITableOrderGrain
 
     }
 
+    public Task ReceiveReminder(string reminderName, TickStatus status)
+    {
+        return reminderName switch
+        {
+            "TableOrderExpired" => CloseTableOrder(),
+            _ => Task.CompletedTask
+        };
+    }
 }

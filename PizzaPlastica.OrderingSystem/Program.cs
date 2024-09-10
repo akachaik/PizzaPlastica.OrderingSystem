@@ -8,6 +8,7 @@ builder.Host.UseOrleans(siloBuilder =>
     {
         siloBuilder.UseLocalhostClustering();
         siloBuilder.AddMemoryGrainStorage("table-order-storage");
+        siloBuilder.UseInMemoryReminderService();
     }
     
 });

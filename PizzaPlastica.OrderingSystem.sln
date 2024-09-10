@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlastica.OrderingSyste
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlastica.OrderingSystem.Abstractions", "PizzaPlastica.OrderingSystem.Abstractions\PizzaPlastica.OrderingSystem.Abstractions.csproj", "{09DF864C-D626-4AA0-B648-76B7D1323F42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PizzaPlastica.OrderingSystem.Tests", "PizzaPlastica.OrderingSystem.Tests\PizzaPlastica.OrderingSystem.Tests.csproj", "{959A01CC-D3B0-49C7-972C-1FAC58D7D3C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{09DF864C-D626-4AA0-B648-76B7D1323F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09DF864C-D626-4AA0-B648-76B7D1323F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09DF864C-D626-4AA0-B648-76B7D1323F42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{959A01CC-D3B0-49C7-972C-1FAC58D7D3C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{959A01CC-D3B0-49C7-972C-1FAC58D7D3C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{959A01CC-D3B0-49C7-972C-1FAC58D7D3C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{959A01CC-D3B0-49C7-972C-1FAC58D7D3C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

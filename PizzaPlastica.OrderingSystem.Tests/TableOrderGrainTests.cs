@@ -28,6 +28,7 @@ public class TableOrderGrainTests
 
         // ASSERT
         Assert.That(orderItems.Count, Is.EqualTo(1));
+
         Assert.That(orderItems[0].Id, Is.EqualTo(orderItemId));
         Assert.That(orderItems[0].Name, Is.EqualTo("Pizza Hawaii"));
         Assert.That(orderItems[0].Cost, Is.EqualTo(6.5));

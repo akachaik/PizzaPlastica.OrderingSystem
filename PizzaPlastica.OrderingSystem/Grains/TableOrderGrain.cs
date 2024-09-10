@@ -1,53 +1,67 @@
-﻿using Orleans;
-using Orleans.Runtime;
-using PizzaPlastica.OrderingSystem.Abstractions;
+﻿using PizzaPlastica.OrderingSystem.Abstractions;
 using PizzaPlastica.OrderingSystem.Exceptions;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace PizzaPlastica.OrderingSystem.Grains;
 
+public class TableOrderState
+{
+    [Id(0)]
+    public bool IsOpen { get; set; }
+
+    [Id(1)]
+    public List<TableOrderItem> OrderItems { get; set; } = new();
+}
+
 public class TableOrderGrain : Grain, ITableOrderGrain
 {
-    private bool IsOpen { get; set; }
-    private List<TableOrderItem> OrderItems { get; set; } = new();
 
-    public Task OpenTableOrder()
+    private readonly IPersistentState<TableOrderState> _state;
+
+    public TableOrderGrain(
+        [PersistentState("table-order", "table-order-storage")]
+        IPersistentState<TableOrderState> state)
     {
-        if (IsOpen)
+        _state = state;
+    }
+
+    public async Task OpenTableOrder()
+    {
+        if (_state.State.IsOpen)
         {
             throw new InvalidStateException("Table has already opened.");
         }
 
-        this.IsOpen = true;
+        this._state.State.IsOpen = true;
 
-        OrderItems = new List<TableOrderItem>();
+        _state.State.OrderItems = new List<TableOrderItem>();
 
-        return Task.CompletedTask;
+        await _state.WriteStateAsync();
+
     }
 
-    public Task CloseTableOrder()
+    public async Task CloseTableOrder()
     {
-        if (!IsOpen)
+        if (!_state.State.IsOpen)
         {
             throw new InvalidStateException("Table has already closed.");
         }
 
-        IsOpen = false;
-        OrderItems = new List<TableOrderItem>();
+        _state.State.IsOpen = false;
+        _state.State.OrderItems = new List<TableOrderItem>();
 
-        return Task.CompletedTask;
+        await _state.WriteStateAsync();
     }
 
-    public Task<Guid> AddOrderItem(string name, double cost, int quantity)
+    public async Task<Guid> AddOrderItem(string name, double cost, int quantity)
     {
-        if (!IsOpen)
+        if (!_state.State.IsOpen)
         {
             throw new InvalidStateException("Table should be opened.");
         }
 
         var orderItemId = Guid.NewGuid();
-        OrderItems.Add(new TableOrderItem
+        _state.State.OrderItems.Add(new TableOrderItem
         {
             Id = orderItemId,
             Name = name,
@@ -55,26 +69,29 @@ public class TableOrderGrain : Grain, ITableOrderGrain
             Quantity = quantity
         });
 
-        return Task.FromResult(orderItemId);
+        await _state.WriteStateAsync();
+
+        return orderItemId;
     }
 
     public Task<TableOrderItem> GetOrderItemDetails(Guid orderItemId)
     {
-        var orderItemDetails = OrderItems.Single(x => x.Id == orderItemId);
+        var orderItemDetails = _state.State.OrderItems.Single(x => x.Id == orderItemId);
         return Task.FromResult(orderItemDetails);
     }
 
     public Task<ReadOnlyCollection<TableOrderItem>> GetOrderItems()
     {
-        return Task.FromResult(OrderItems.AsReadOnly());
+        return Task.FromResult(_state.State.OrderItems.AsReadOnly());
     }
 
-    public Task RemoveOrderItem(Guid orderItemId)
+    public async Task RemoveOrderItem(Guid orderItemId)
     {
-        var orderItem = OrderItems.Single(x => x.Id == orderItemId);
-        OrderItems.Remove(orderItem);
+        var orderItem = _state.State.OrderItems.Single(x => x.Id == orderItemId);
+        _state.State.OrderItems.Remove(orderItem);
 
-        return Task.CompletedTask;
+        await _state.WriteStateAsync();
+
     }
 
 }

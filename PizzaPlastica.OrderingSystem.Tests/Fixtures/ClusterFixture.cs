@@ -29,7 +29,7 @@ public class TestSiloConfigurations : ISiloConfigurator
             serializerBuilder.AddNewtonsoftJsonSerializer(
                 isSupported: type => type.Namespace?.StartsWith("PizzaPlastica.OrderingSystem.Abstractions") ?? false);
         });
-        siloBuilder.AddMemoryGrainStorage("tableorderstorage");
+        siloBuilder.AddMemoryGrainStorage("table-order-storage");
         siloBuilder.UseInMemoryReminderService();
     }
 }

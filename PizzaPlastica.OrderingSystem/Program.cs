@@ -7,7 +7,7 @@ builder.Host.UseOrleans(siloBuilder =>
     if (builder.Environment.IsDevelopment())
     {
         siloBuilder.UseLocalhostClustering();
-        siloBuilder.AddMemoryGrainStorage("tableorderstorage");
+        siloBuilder.AddMemoryGrainStorage("table-order-storage");
     }
     
 });

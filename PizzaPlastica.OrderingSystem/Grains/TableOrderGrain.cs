@@ -10,7 +10,7 @@ public class TableOrderState
     public bool IsOpen { get; set; }
 
     [Id(1)]
-    public List<TableOrderItem> OrderItems { get; set; } = new();
+    public List<TableOrderItem> OrderItems { get; set; } = [];
 }
 
 public class TableOrderGrain : Grain, ITableOrderGrain, IRemindable
@@ -20,7 +20,9 @@ public class TableOrderGrain : Grain, ITableOrderGrain, IRemindable
 
     private IGrainReminder? _reminder = null;
 
+#pragma warning disable IDE0290 // Use primary constructor
     public TableOrderGrain(
+#pragma warning restore IDE0290 // Use primary constructor
         [PersistentState("table-order", "table-order-storage")]
         IPersistentState<TableOrderState> state)
     {
@@ -36,7 +38,7 @@ public class TableOrderGrain : Grain, ITableOrderGrain, IRemindable
 
         this._state.State.IsOpen = true;
 
-        _state.State.OrderItems = new List<TableOrderItem>();
+        _state.State.OrderItems = [];
 
         _reminder = await this.RegisterOrUpdateReminder(reminderName: "TableOrderExpired",
             dueTime: TimeSpan.FromMinutes(2),
@@ -54,7 +56,7 @@ public class TableOrderGrain : Grain, ITableOrderGrain, IRemindable
         }
 
         _state.State.IsOpen = false;
-        _state.State.OrderItems = new List<TableOrderItem>();
+        _state.State.OrderItems = [];
 
         if (_reminder is not null)
         {

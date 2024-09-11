@@ -14,7 +14,18 @@ public class ClusterFixture : IDisposable
         Cluster.Deploy();
     }
 
-    public void Dispose() => Cluster.StopAllSilos();
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        // Cleanup
+        Cluster.StopAllSilos();
+    }
+
     public TestCluster Cluster { get; }
 }
 

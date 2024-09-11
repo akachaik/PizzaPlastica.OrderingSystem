@@ -27,12 +27,15 @@ public class TableOrderGrainTests
         var orderItems = await tableOrderGrain.GetOrderItems();
 
         // ASSERT
-        Assert.That(orderItems.Count, Is.EqualTo(1));
+        Assert.That(orderItems, Has.Count.EqualTo(1));
 
-        Assert.That(orderItems[0].Id, Is.EqualTo(orderItemId));
-        Assert.That(orderItems[0].Name, Is.EqualTo("Pizza Hawaii"));
-        Assert.That(orderItems[0].Cost, Is.EqualTo(6.5));
-        Assert.That(orderItems[0].Quantity, Is.EqualTo(1));
+        Assert.Multiple(() =>
+        {
+            Assert.That(orderItems[0].Id, Is.EqualTo(orderItemId));
+            Assert.That(orderItems[0].Name, Is.EqualTo("Pizza Hawaii"));
+            Assert.That(orderItems[0].Cost, Is.EqualTo(6.5));
+            Assert.That(orderItems[0].Quantity, Is.EqualTo(1));
+        });
     }
 
     [TearDown]

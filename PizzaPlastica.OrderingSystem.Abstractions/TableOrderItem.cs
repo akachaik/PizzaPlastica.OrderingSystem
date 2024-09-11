@@ -3,6 +3,7 @@
 namespace PizzaPlastica.OrderingSystem.Abstractions;
 
 [GenerateSerializer]
+[Alias("PizzaPlastica.OrderingSystem.Abstractions.TableOrderItem")]
 public class TableOrderItem
 {
     [Id(0)]

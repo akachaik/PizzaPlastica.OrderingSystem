@@ -1,6 +1,10 @@
+using Orleans.Configuration;
+using Orleans.Serialization;
 using PizzaPlastica.OrderingSystem.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 builder.Host.UseOrleans(siloBuilder =>
 {
@@ -10,7 +14,40 @@ builder.Host.UseOrleans(siloBuilder =>
         siloBuilder.AddMemoryGrainStorage("table-order-storage");
         siloBuilder.UseInMemoryReminderService();
     }
-    
+    else
+    {
+        siloBuilder.Services.AddSerializer(serializerBuilder =>
+        {
+            serializerBuilder.AddNewtonsoftJsonSerializer(
+                isSupported: type => type.Namespace?.StartsWith("PizzaPlastica.OrderingSystem.Abstractions") ?? false);
+        });
+
+        // CREAZIONE DEL CLUSTER PER AMBIENTI DI STAGING / PRODUZIONE
+        siloBuilder.Configure<ClusterOptions>(options =>
+        {
+            options.ClusterId = "PizzaPlasticaCluster";
+            options.ServiceId = "BestOrderingSystemEver";
+        })
+        .UseAdoNetClustering(options =>
+        {
+            options.ConnectionString = builder.Configuration.GetConnectionString("SqlOrleans");
+            options.Invariant = "System.Data.SqlClient";
+        })
+        .ConfigureEndpoints(siloPort: 11111, gatewayPort: 30000);
+
+        // REGISTRAZIONE REMINDERS PER AMBIENTI DI STAGING / PRODUZIONE
+        siloBuilder.UseAdoNetReminderService(reminderOptions => {
+            reminderOptions.ConnectionString = builder.Configuration.GetConnectionString("SqlOrleans");
+            reminderOptions.Invariant = "System.Data.SqlClient";
+        });
+
+        // REGISTRAZIONE STORAGE PER AMBIENTI DI STAGING / PRODUZIONE
+        siloBuilder.AddAdoNetGrainStorage("table-order-storage", storageOptions =>
+        {
+            storageOptions.ConnectionString = builder.Configuration.GetConnectionString("SqlOrleans");
+            storageOptions.Invariant = "System.Data.SqlClient";
+        });
+    }
 });
 
 // Add services to the container.
@@ -21,7 +58,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
